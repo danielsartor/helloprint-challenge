@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  php:
+    build: ./docker/php
+    volumes:
+        - ./:/usr/helloprint/
+    working_dir: /usr/helloprint/
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_CREATE_TOPICS: "TopicA:1:1,TopicB:1:1,Requester:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
