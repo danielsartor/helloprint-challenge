@@ -7,6 +7,14 @@ services:
         - ./:/usr/helloprint/
     working_dir: /usr/helloprint/
 
+  db:
+    build: ./docker/postgres
+    restart: always
+    environment:
+      POSTGRES_USER: hellouser
+      POSTGRES_PASSWORD: hellopass
+      POSTGRES_DB: helloprint
+      
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
