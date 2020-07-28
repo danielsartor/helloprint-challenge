@@ -7,7 +7,7 @@ services:
         - ./:/usr/helloprint/
     working_dir: /usr/helloprint/
 
-  db:
+  postgres:
     build: ./docker/postgres
     restart: always
     environment:
@@ -30,3 +30,17 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock
+
+  connect:
+    image: debezium/connect
+    ports:
+      - 8083:8083
+    environment:
+      GROUP_ID: 1
+      BOOTSTRAP_SERVERS: kafka:9092
+      CONFIG_STORAGE_TOPIC: "postgres-config"
+      OFFSET_STORAGE_TOPIC: "postgres-offset"
+    links:
+      - "zookeeper:zookeeper"
+      - "postgres:postgres"
+      - "kafka:kafka"
