@@ -7,16 +7,18 @@
 ## SETUP ENVIROMENT
 Open your terminal and run `docker-compose up -d`
 
-When the installation is done run the following command to create the connect configuration.
-`curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 127.0.0.1:8083/connectors/ -d "{ \"name\": \"helloprint-connector\", \"config\": { \"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\", \"tasks.max\": \"1\", \"database.hostname\": \"postgres\", \"database.port\": \"5432\", \"database.user\": \"hellouser\", \"database.password\": \"hellopass\", \"database.dbname\" : \"helloprint\", \"database.server.name\": \"helloprint\", \"database.whitelist\": \"helloprint\", \"database.history.kafka.bootstrap.servers\": \"kafka:9092\", \"database.history.kafka.topic\": \"schema-changes.helloprint\" } }"`
+When the installation is done run the following commands from the CONFIG folder to create the connect configuration.
 
-The command will be executed correctly when you receive the following response.
-`HTTP/1.1 201 Created
-Date: Tue, 28 Jul 2020 19:35:16 GMT
-Location: http://127.0.0.1:8083/connectors/helloprint-connector
-Content-Type: application/json
-Content-Length: 516
-Server: Jetty(9.4.24.v20191120)`
+Postgres Source
+`curl -X POST -H "Accept:application/json" -H "Content-Type: application/json" --data @postgres-source.json http://localhost:8083/connectors`
+
+Postgres Sink
+`curl -X POST -H "Accept:application/json" -H "Content-Type: application/json" --data @postgres-sink.json http://localhost:8083/connectors`
+
+To check if both connectors were created you can access the URL
+`http://localhost:8083/connectors/`
+Or run the following command
+`curl -H "Accept:application/json" localhost:8083/connectors/`
 
 ## HOW TO EXECUTE
 Open 3 Terminals and execute each command in a terminal.

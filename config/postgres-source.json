@@ -1,0 +1,16 @@
+{
+  "name": "postgres-source",
+  "config": {
+    "tasks.max": "1",
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "hellouser",
+    "database.password": "hellopass",
+    "database.dbname": "helloprint",
+    "database.server.name": "dbserver1",
+    "database.whitelist": "helloprint",
+    "database.history.kafka.bootstrap.servers": "kafka:9094",
+    "database.history.kafka.topic": "schema-changes.requests"
+  }
+}

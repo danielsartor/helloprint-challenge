@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS helloprint AUTHORIZATION hellouser;
 SET search_path TO helloprint;
 
 -- enable PostGis 
-CREATE EXTENSION postgis;
+-- CREATE EXTENSION postgis;
 
 -- Create table
 CREATE TABLE requests (
