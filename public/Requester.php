@@ -1,10 +1,15 @@
 <?php
+    
+    //Configuration
+    $conf = new \RdKafka\Conf();
+    $conf->set("bootstrap.servers", "kafka:9094");
+
     //Producer
-    $producer = new \RdKafka\Producer();
+    $producer = new \RdKafka\Producer($conf);
     $producer->setLogLevel(LOG_DEBUG);
 
     //Broker
-    if ($producer->addBrokers("kafka:9092") < 1) {
+    if ($producer->addBrokers("kafka:9094") < 1) {
         echo "Failed adding brokers\n";
         exit;
     }
@@ -23,16 +28,16 @@
 
     echo "Message Sent to TopicA: ".$message."\n";
 
+    //Consumer
+    $consumer = new \RdKafka\Consumer($conf);
+    $consumer->setLogLevel(LOG_DEBUG);
+    
     //Consume Response
-    startConsumingMessage();
+    startConsumingMessage($consumer);
 
-    function startConsumingMessage() {
-        //Consumer
-        $consumer = new \RdKafka\Consumer();
-        $consumer->setLogLevel(LOG_DEBUG);
-
+    function startConsumingMessage($consumer) {
         //Broker
-        $consumer->addBrokers("kafka:9092");
+        $consumer->addBrokers("kafka:9094");
 
         //Requester Topic
         $topic = $consumer->newTopic("Requester");
