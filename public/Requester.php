@@ -15,7 +15,7 @@
     }
 
     //TopicA Topic
-    $topic = $producer->newTopic("Requester");
+    $topic = $producer->newTopic("helloprint.requests");
 
     if (!$producer->getMetadata(false, $topic, 2000)) {
         echo "Failed to get metadata, is broker down?\n";
@@ -24,42 +24,27 @@
 
     //Send Message to Topic
     $message = "Hi, ";
-    $data = ["schema" => [
-           "type" => "struct",
-           "fields" => [
-              [
-                 "type" => "struct",
-                 "fields" => [
-                    [
-                       "type" => "int32",
-                       "optional" => false,
-                       "field" => "id"
-                    ],
-                    [
-                       "type" => "string",
-                       "optional" => false,
-                       "field" => "message"
-                    ],
-                    [
-                       "type" => "string",
-                       "optional" => true,
-                       "field" => "response"
-                    ]
-                 ],
-                 "optional" => true,
-                 "name" => "dbserver1.helloprint.requests.Value"
-              ]
-           ]
+    $data = [
+        "schema" => [
+            "type" => "struct",
+            "fields" => [
+                [
+                    "type" => "string",
+                    "optional" => false,
+                    "field" => "message"
+                ]
             ],
+            "optional" => false,
+            "name" => "dbserver1.helloprint.requests.Value"
+        ],
         "payload" => [
-           "message" => "Hiya,"
+            "message" => $message
         ]
     ];
 
-
     $dataJson = json_encode($data);
 
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, "Hi :D ? :C");
+    $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataJson);
 
     echo "Message Sent to TopicA: ".$message."\n";
 
