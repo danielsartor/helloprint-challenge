@@ -1,57 +1,38 @@
 <?php
-    
-    //Configuration
-    $conf = new \RdKafka\Conf();
-    $conf->set("bootstrap.servers", "kafka:9094");
+    require_once('helpers/helpers.php');
 
     //Producer
     $producer = new \RdKafka\Producer($conf);
     $producer->setLogLevel(LOG_DEBUG);
 
-    //Broker
-    if ($producer->addBrokers("kafka:9094") < 1) {
-        echo "Failed adding brokers\n";
-        exit;
-    }
-
-    //TopicA Topic
-    $topic = $producer->newTopic("helloprint.requests");
-
-    if (!$producer->getMetadata(false, $topic, 2000)) {
-        echo "Failed to get metadata, is broker down?\n";
-        exit;
-    }
-
-    //Send Message to Topic
-    $message = "Hi, ";
-    $data = [
-        "schema" => [
-            "type" => "struct",
-            "fields" => [
-                [
-                    "type" => "string",
-                    "optional" => false,
-                    "field" => "message"
-                ]
-            ],
-            "optional" => false,
-            "name" => "dbserver1.helloprint.requests.Value"
-        ],
-        "payload" => [
-            "message" => $message
-        ]
-    ];
-
-    $dataJson = json_encode($data);
-
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataJson);
-
-    echo "Message Sent to TopicA: ".$message."\n";
-
     //Consumer
     $consumer = new \RdKafka\Consumer($conf);
     $consumer->setLogLevel(LOG_DEBUG);
+
+    //Data
+    $messages = [
+        "id" => uniqid(),
+        "message" => "Hi, "
+    ];
+
+    $fields = [
+        [
+            "type" => "string",
+            "optional" => false,
+            "field" => "id"
+        ],[
+            "type" => "string",
+            "optional" => false,
+            "field" => "message"
+        ]
+    ];
+
+    $dataJson = buildJsonMessage($fields, $messages);
+
+    sendMessage($producer, "helloprint.requests", $dataJson);
     
+    echo "Message Sent to Postgres: ".$messages->message."\n";
+
     //Consume Response
     startConsumingMessage($consumer);
 
@@ -60,19 +41,26 @@
         $consumer->addBrokers("kafka:9094");
 
         //Requester Topic
-        $topic = $consumer->newTopic("dbserver1.helloprint.requests");
+        $topic = $consumer->newTopic("Requester");
 
         //Start Consuming
         $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
 
-        echo "Consuming Topic: Requester\n";
+        echo "Consuming from Requester\n";
         while (true) {
             //Consume Interval
-            $msg = $topic->consume(0, 1000);
+            $msg = $topic->consume(0, 50);
 
-            //Message exists
-            if ($msg->payload) {
-                echo $msg->payload, "\n";
+            if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+                continue;
+            } elseif ($msg->err) {
+                echo $msg->errstr(), "\n";
+                break;
+            } else {
+                if ($msg->payload) {
+                    $data = json_decode($msg->payload);
+                    echo $data->message."\n";
+                }
             }
         }
     }

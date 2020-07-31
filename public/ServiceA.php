@@ -1,10 +1,11 @@
 <?php
-    $message = "";
+    require_once('helpers/helpers.php');
+
     $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
 
-    //Configuration
-    $conf = new \RdKafka\Conf();
-    $conf->set("bootstrap.servers", "kafka:9094");
+    //Producer
+    $producer = new \RdKafka\Producer($conf);
+    $producer->setLogLevel(LOG_DEBUG);
 
     //Consumer
     $consumer = new \RdKafka\Consumer($conf);
@@ -19,41 +20,28 @@
     //Start Consuming
     $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
 
-    echo "Consuming Topic: TopicA\n";
+    echo "Consuming from TopicA\n";
     while (true) {
-        //Consume Interval
         $msg = $topic->consume(0, 1000);
 
-        //Message exists
-        if ($msg->payload) {
-            $message = $msg->payload;
-            echo "Message Received: ".$msg->payload."\n";
+        if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+            continue;
+        } elseif ($msg->err) {
+            echo $msg->errstr(), "\n";
+            break;
+        } else {
+            $data = json_decode($msg->payload);
+            echo "Message Received: ".$data->message."\n";
 
-            //Producer
-            $producer = new \RdKafka\Producer($conf);
-            $producer->setLogLevel(LOG_DEBUG);
+            //Format Message
+            $formatted_message = $data->message . $names[array_rand($names)].". ";
 
-            sendMessage($producer, $message, $names);
+            $data->message = $formatted_message;
+
+            $dataJson = json_encode($data);
+
+            sendMessage($producer, "TopicB", $dataJson);
+
+            echo "Message Sent to TopicB: ".$formatted_message."\n";
         }
-    }
-
-    function sendMessage($producer, $message, $names) {
-        if ($producer->addBrokers("kafka:9094") < 1) {
-            echo "Failed adding brokers\n";
-            exit;
-        }
-
-        //TopicA Topic
-        $topic = $producer->newTopic("TopicB");
-
-        if (!$producer->getMetadata(false, $topic, 2000)) {
-            echo "Failed to get metadata, is broker down?\n";
-            exit;
-        }
-
-        //Send Message to Topic
-        $formatted_message = $message . $names[array_rand($names)].". ";
-        $topic->produce(RD_KAFKA_PARTITION_UA, 0, $formatted_message);
-
-        echo "Message Sent to TopicB: ".$formatted_message."\n";
     }

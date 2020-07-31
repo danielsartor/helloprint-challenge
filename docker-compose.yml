@@ -30,7 +30,7 @@ services:
       KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
       KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://kafka:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_CREATE_TOPICS: "TopicA:1:1,TopicB:1:1,helloprint.requests:1:1,dbserver1.helloprint.requests:1:1"
+      KAFKA_CREATE_TOPICS: "TopicA:1:1,TopicB:1:1,Requester:1:1,helloprint.requests:1:1,dbserver1.helloprint.requests:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
 

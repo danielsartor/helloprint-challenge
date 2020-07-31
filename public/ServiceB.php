@@ -1,10 +1,11 @@
 <?php
-    $message = "";
+    require_once('helpers/helpers.php');
+
     $bye = "Bye.";
 
-    //Configuration
-    $conf = new \RdKafka\Conf();
-    $conf->set("bootstrap.servers", "kafka:9094");
+    //Producer
+    $producer = new \RdKafka\Producer($conf);
+    $producer->setLogLevel(LOG_DEBUG);
 
     //Consumer
     $consumer = new \RdKafka\Consumer($conf);
@@ -15,46 +16,48 @@
 
     //TopicB Topic
     $topic = $consumer->newTopic("TopicB");
-
+    
     //Start Consuming
     $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
 
-    echo "Consuming Topic: TopicB\n";
+    echo "Consuming from TopicB\n";
     while (true) {
-        //Consume Interval
         $msg = $topic->consume(0, 1000);
 
-        //Message exists
-        if ($msg->payload) {
-            $message = $msg->payload;
-            echo "Message Received: ".$msg->payload."\n";
+        if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+            continue;
+        } elseif ($msg->err) {
+            echo $msg->errstr(), "\n";
+            break;
+        } else {
+            $data = json_decode($msg->payload);
+            echo "Message Received: ".$data->message."\n";
 
-            //Producer
-            $producer = new \RdKafka\Producer($conf);
-            $producer->setLogLevel(LOG_DEBUG);
+            //Data
+            $formatted_message = $data->message . $bye;
 
-            sendMessage($producer, $message, $bye);
+            $messages = [
+                "id" => $data->id,
+                "message" => $formatted_message
+            ];
+
+            $fields = [
+                [
+                    "type" => "string",
+                    "optional" => false,
+                    "field" => "id"
+                ],
+                [
+                    "type" => "string",
+                    "optional" => false,
+                    "field" => "message"
+                ]
+            ];
+
+            $dataJson = buildJsonMessage($fields, $messages);
+
+            sendMessage($producer, "helloprint.requests", $dataJson);
+
+            echo "Message Sent to Postgres: ".$formatted_message."\n";
         }
-    }
-
-    function sendMessage($producer, $message, $bye) {
-        //Broker
-        if ($producer->addBrokers("kafka:9094") < 1) {
-            echo "Failed adding brokers\n";
-            exit;
-        }
-
-        //TopicA Topic
-        $topic = $producer->newTopic("Requester");
-
-        if (!$producer->getMetadata(false, $topic, 2000)) {
-            echo "Failed to get metadata, is broker down?\n";
-            exit;
-        }
-
-        //Send Message to Topic
-        $formatted_message = $message . $bye;
-        $topic->produce(RD_KAFKA_PARTITION_UA, 0, $formatted_message);
-
-        echo "Message Sent to Requester: ".$formatted_message."\n";
     }

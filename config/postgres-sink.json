@@ -12,6 +12,8 @@
     "value.converter.schemas.enable": "true",
     "auto.create": "true",
     "auto.evolve": "true",
-    "insert.mode": "insert"
+    "insert.mode": "upsert",
+    "pk.fields": "id",
+    "pk.mode": "record_value"
   }
 }
