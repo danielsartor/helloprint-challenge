@@ -2,12 +2,8 @@
 CREATE SCHEMA IF NOT EXISTS helloprint AUTHORIZATION hellouser;
 SET search_path TO helloprint;
 
--- enable PostGis 
--- CREATE EXTENSION postgis;
-
 -- Create table
 CREATE TABLE requests (
-  id SERIAL NOT NULL PRIMARY KEY,
-  message VARCHAR(255) NOT NULL,
-  response VARCHAR(255) NULL
+  id VARCHAR(50) PRIMARY KEY NOT NULL,
+  message VARCHAR(255) NOT NULL
 );
