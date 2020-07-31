@@ -19,7 +19,8 @@ Run the following command to check if both connectors were created.
 `curl -H "Accept:application/json" localhost:8083/connectors/`
 
 ## HOW TO EXECUTE
-Open 3 Terminals and execute each command in a terminal.
-Terminal 1: `exec php php /usr/helloprint/public/ServiceA.php`
-Terminal 2: `exec php php /usr/helloprint/public/ServiceB.php`
-Terminal 3: `exec php php /usr/helloprint/public/Requester.php`
+Open 4 Terminals and execute each command in a terminal.
+Terminal 1: `exec php php /usr/helloprint/public/ServiceA.php`.
+Terminal 2: `exec php php /usr/helloprint/public/ServiceB.php`.
+Terminal 3: `exec php php /usr/helloprint/public/Broker.php`.
+Terminal 4: `exec php php /usr/helloprint/public/Requester.php`.
