@@ -36,12 +36,12 @@
                 if (!$gotData) {
                     $gotData = true;
                     echo "Initial Message\n";
-                    //sendMessage($producer, "Requester", json_encode($data->payload->after));
+                    sendMessage($producer, "Requester", json_encode($data->payload->after));
                     sendMessage($producer, "TopicA", json_encode($data->payload->after));
                 } else {
                     $gotData = false;
                     echo "Response\n";
-                    sendMessage($producer, "Requester", json_encode($data->payload->after));
+                    sendMessage($producer, "Broker", json_encode($data->payload->after));
                 }
                 
             }
