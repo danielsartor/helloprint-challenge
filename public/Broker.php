@@ -35,12 +35,12 @@
                 $data = json_decode($msg->payload);
                 if (!$gotData) {
                     $gotData = true;
-                    echo "Initial Message\n";
+                    echo "Inicital Message: ".json_encode($data->payload->after)."\n";
                     sendMessage($producer, "Requester", json_encode($data->payload->after));
                     sendMessage($producer, "TopicA", json_encode($data->payload->after));
                 } else {
                     $gotData = false;
-                    echo "Response\n";
+                    echo "Response: ".json_encode($data->payload->after)."\n";
                     sendMessage($producer, "Broker", json_encode($data->payload->after));
                 }
                 

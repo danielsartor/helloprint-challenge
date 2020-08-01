@@ -43,62 +43,41 @@
         $topic = $consumer->newTopic("Requester");
 
         //Start Consuming
-        $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
-        
-        //Message ID
-        $id =  NULL;
+        $topic->consumeStart(0, RD_KAFKA_OFFSET_END);
 
-        while (true) {
-            //Consume Interval
-            $msg = $topic->consume(0, 1000);
-        
-            if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-                continue;
-            } elseif ($msg->err) {
-                echo $msg->errstr(), "\n";
-                break;
-            } else {
-                if ($msg->payload) {
-                    $data = json_decode($msg->payload);
+        $message = $topic->consume(0, 1000);
+        $message = json_decode($message->payload);
 
-                    if (!$id) {
-                        $id = $data->id;
-                        echo "Received ID: ".$id."\n";
-                        break;
-                    }
-                }
-            }
-        }
+        if ($message->id) {
+            //Broker Topic
+            $topicConf = new RdKafka\TopicConf();
+            $topicConf->set("request.timeout.ms", 1000);
+            $topic = $consumer->newTopic("Broker", $topicConf);
 
-        //Broker Topic
-        $topicConf = new RdKafka\TopicConf();
-        $topicConf->set("request.timeout.ms", 1000);
-        $topic = $consumer->newTopic("Broker", $topicConf);
+            //Start Consuming
+            $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
 
-        //Start Consuming
-        $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+            echo "Consuming from Broker\n";
 
-        echo "Consuming from Broker\n";
-
-        while (true) {
-            //Consume Interval
-            $msg = $topic->consume(0, 50);
-        
-            if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-                continue;
-            } else if ($msg->err == RD_KAFKA_RESP_ERR__TIMED_OUT) {
-                echo "No reponse\n";
-                exit;
-            } elseif ($msg->err) {
-                echo $msg->errstr(), "\n";
-                exit;
-            } else {
-                if ($msg->payload) {
-                    $data = json_decode($msg->payload);
-                    if ($id == $data->id) {
-                        echo $data->message;
-                        $id = NULL;
-                        exit;
+            while (true) {
+                //Consume Interval
+                $msg = $topic->consume(0, 50);
+            
+                if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+                    continue;
+                } else if ($msg->err === RD_KAFKA_RESP_ERR__TIMED_OUT) {
+                    echo "No reponse\n";
+                    exit;
+                } elseif ($msg->err) {
+                    echo $msg->errstr(), "\n";
+                    exit;
+                } else {
+                    if ($msg->payload) {
+                        $data = json_decode($msg->payload);
+                        if ($message->id == $data->id) {
+                            echo $data->message;
+                            exit;
+                        }
                     }
                 }
             }
