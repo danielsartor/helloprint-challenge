@@ -22,5 +22,5 @@ Run the following command to check if both connectors were created.
 Open 4 Terminals and execute each command in a terminal.
 Terminal 1: `exec php php /usr/helloprint/public/ServiceA.php`.
 Terminal 2: `exec php php /usr/helloprint/public/ServiceB.php`.
-Terminal 3: `exec php php /usr/helloprint/public/Broker.php`.
+Terminal 3: `exec php php /usr/helloprint/public/Connector.php`.
 Terminal 4: `exec php php /usr/helloprint/public/Requester.php`.

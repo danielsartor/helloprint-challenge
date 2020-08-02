@@ -3,11 +3,6 @@
 
     //Producer
     $producer = new \RdKafka\Producer($conf);
-    $producer->setLogLevel(LOG_DEBUG);
-
-    //Consumer
-    $consumer = new \RdKafka\Consumer($conf);
-    $consumer->setLogLevel(LOG_DEBUG);
 
     //Data
     $messages = [
@@ -30,77 +25,74 @@
     $dataJson = buildJsonMessage($fields, $messages);
 
     sendMessage($producer, "helloprint.requests", $dataJson);
-    echo "Message Sent to Postgres: ".$messages['message']."\n";
+
+    echo "Message Sent to Connector Sink: ".$messages['message']."\n";
 
     //Consume Response
-    startConsumingMessage($consumer);
+    startConsumingMessage();
 
-    function startConsumingMessage($consumer) {
+    function startConsumingMessage() {
+        //Configuration
+        $conf = new \RdKafka\Conf();
+        $conf->set("bootstrap.servers", "kafka:9094");
+
+        //Consumer
+        $consumer = new \RdKafka\Consumer($conf);
+        
         //Broker
         $consumer->addBrokers("kafka:9094");
-
+        
         //Requester Topic
         $topic = $consumer->newTopic("Requester");
-
+        
         //Start Consuming
         $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
         
-        //Message ID
-        $id =  NULL;
-
-        while (true) {
-            //Consume Interval
-            $msg = $topic->consume(0, 1000);
+        //Sometimes RD_KAFKA_OFFSET_END would fail to retrive messages.
+        $message = NULL;
         
-            if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-                continue;
-            } elseif ($msg->err) {
-                echo $msg->errstr(), "\n";
-                break;
-            } else {
-                if ($msg->payload) {
-                    $data = json_decode($msg->payload);
-
-                    if (!$id) {
-                        $id = $data->id;
-                        echo "Received ID: ".$id."\n";
-                        break;
-                    }
-                }
-            }
+        while(true) {
+            $msg = $topic->consume(0, 1000);
+            $message = json_decode($msg->payload) ?? $message;
+            if (!$msg) break;
         }
 
-        //Broker Topic
-        $topicConf = new RdKafka\TopicConf();
-        $topicConf->set("request.timeout.ms", 1000);
-        $topic = $consumer->newTopic("Broker", $topicConf);
+        if ($message->id) {
+            //Configuration
+            $conf = new \RdKafka\Conf();
+            $conf->set("bootstrap.servers", "kafka:9094");
 
-        //Start Consuming
-        $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+            //Consumer
+            $consumer = new \RdKafka\Consumer($conf);
 
-        echo "Consuming from Broker\n";
+            //Broker Topic
+            $topic = $consumer->newTopic("Broker");
 
-        while (true) {
-            //Consume Interval
-            $msg = $topic->consume(0, 50);
-        
-            if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-                continue;
-            } else if ($msg->err == RD_KAFKA_RESP_ERR__TIMED_OUT) {
-                echo "No reponse\n";
-                exit;
-            } elseif ($msg->err) {
-                echo $msg->errstr(), "\n";
-                exit;
-            } else {
-                if ($msg->payload) {
+            //Start Consuming
+            $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+
+            echo "Consuming from Broker\n";
+
+            //Temporary solution for time out. 
+            //RD_KAFKA_OFFSET_BEGINNING needs to consume every message in the stack in order to reach the end
+            //RD_KAFKA_OFFSET_END is returning null always.
+            $start_time = round(microtime(true) * 1000);
+            while(true) {
+                $msg = $topic->consume(0, 50);
+                $time = round(microtime(true) * 1000);
+                if (($time - $start_time) > 1000) {
+                    echo "TIMEOUT: No reponse for ID: ".$message->id."\n";
+                    exit;
+                } else if ($msg){
                     $data = json_decode($msg->payload);
-                    if ($id == $data->id) {
+                    if ($message->id == $data->id) {
                         echo $data->message;
-                        $id = NULL;
                         exit;
                     }
                 }
             }
+        } else {
+            echo 'ERROR: Failed to retrieve ID.';
+            exit;
         }
     }

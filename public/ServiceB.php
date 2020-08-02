@@ -5,11 +5,9 @@
 
     //Producer
     $producer = new \RdKafka\Producer($conf);
-    $producer->setLogLevel(LOG_DEBUG);
 
     //Consumer
     $consumer = new \RdKafka\Consumer($conf);
-    $consumer->setLogLevel(LOG_DEBUG);
 
     //Broker
     $consumer->addBrokers("kafka:9094");
@@ -58,6 +56,6 @@
 
             sendMessage($producer, "helloprint.requests", $dataJson);
 
-            echo "Message Sent to Postgres: ".$formatted_message."\n";
+            echo "Message Sent to Connector Sink: ".$formatted_message."\n\n";
         }
     }
