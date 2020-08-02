@@ -1,9 +1,9 @@
--- Create the schema that we'll use to populate data and watch the effect in the binlog
+-- Create the schema
 CREATE SCHEMA IF NOT EXISTS helloprint AUTHORIZATION hellouser;
 SET search_path TO helloprint;
 
 -- Create table
 CREATE TABLE requests (
-  id VARCHAR(50) PRIMARY KEY NOT NULL,
+  id CHAR(13) PRIMARY KEY,
   message VARCHAR(255) NOT NULL
 );
