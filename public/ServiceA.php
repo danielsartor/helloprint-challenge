@@ -40,6 +40,6 @@
 
             sendMessage($producer, "TopicB", $dataJson);
 
-            echo "Message Sent to TopicB: ".$formatted_message."\n";
+            echo "Message Sent to TopicB: ".$formatted_message."\n\n";
         }
     }

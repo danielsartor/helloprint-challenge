@@ -56,6 +56,6 @@
 
             sendMessage($producer, "helloprint.requests", $dataJson);
 
-            echo "Message Sent to Postgres: ".$formatted_message."\n";
+            echo "Message Sent to Connector Sink: ".$formatted_message."\n\n";
         }
     }
