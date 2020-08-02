@@ -5,11 +5,9 @@
 
     //Producer
     $producer = new \RdKafka\Producer($conf);
-    $producer->setLogLevel(LOG_DEBUG);
 
     //Consumer
     $consumer = new \RdKafka\Consumer($conf);
-    $consumer->setLogLevel(LOG_DEBUG);
 
     //Broker
     $consumer->addBrokers("kafka:9094");
