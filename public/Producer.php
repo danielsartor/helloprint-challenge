@@ -38,15 +38,5 @@ class Producer
         echo "Produced message $message for Topic $this->topicName\n";
     }
 
-    public function buildJsonMessage($fields, $messages) {
-        return json_encode([
-            "schema" => [
-                "type" => "struct",
-                "fields" => (array) $fields,
-                "optional" => false,
-                "name" => "requests"
-            ],
-            "payload" => (array) $messages
-        ]);
-    }
+    
 }

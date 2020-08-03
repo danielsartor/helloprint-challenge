@@ -2,6 +2,7 @@
 
 namespace Helloprint;
 
+require 'Utils.php';
 require 'ConfigKafka.php';
 require 'Consumer.php';
 require 'Producer.php';
@@ -28,7 +29,7 @@ class Requester
     }
 
     public function produceMessageToTopic() {
-        $dataJson = $this->producer->buildJsonMessage($this->getFields(), $this->getMessages());
+        $dataJson = Utils::buildJsonMessage($this->getFields(), $this->getMessages());
 
         $this->producer->sendMessageToTopic($dataJson);
     }
