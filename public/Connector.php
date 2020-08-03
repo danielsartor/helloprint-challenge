@@ -15,7 +15,8 @@ class Connector
     private $producerTopicA = NULL;
     private $producerBroker = NULL;
 
-    public function __construct() {
+    public function __construct()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -31,7 +32,8 @@ class Connector
         $this->consume();
     }
 
-    public function consume() {
+    public function consume()
+    {
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 
@@ -55,7 +57,8 @@ class Connector
         }
     }
 
-    public function produceInitialMessages() {
+    public function produceInitialMessages()
+    {
         //Produce
         $this->producerRequester->sendMessageToTopic($this->$dataJson);
 
@@ -63,7 +66,8 @@ class Connector
         $this->producerTopicA->sendMessageToTopic($this->$dataJson);
     }
 
-    public function produceFinalMessage() {
+    public function produceFinalMessage()
+    {
         //Produce
         $this->producerBroker->sendMessageToTopic($this->$dataJson);
     }

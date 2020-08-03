@@ -10,11 +10,11 @@ class Producer
     private $topic;
     private $topicName;
 
-    public function __construct($config, $topicName) {
+    public function __construct($config, $topicName)
+    {
         $this->configKafka = $config->getConfig();
-        $this->brokerKafka = $config->getBrokerAddress();
+        $this->brokerKafka = $config::BROKER_ADDRESS;
         $this->topicName = $topicName;
-         
         //Producer
         $this->producer = new \RdKafka\Producer($this->configKafka);
 
@@ -25,7 +25,8 @@ class Producer
         }
     }
 
-    public function sendMessageToTopic($message) {
+    public function sendMessageToTopic($message)
+    {
         $this->topic = $this->producer->newTopic($this->topicName);
 
         if (!$this->producer->getMetadata(false, $this->topic, 2000)) {

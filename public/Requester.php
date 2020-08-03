@@ -14,7 +14,8 @@ class Requester
     private $consumer = NULL;
     private $message = NULL;
 
-    public function __construct() {
+    public function __construct()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -28,13 +29,15 @@ class Requester
         $this->consumeInitialResponse();
     }
 
-    public function produceMessageToTopic() {
+    public function produceMessageToTopic()
+    {
         $dataJson = Utils::buildJsonMessage($this->getFields(), $this->getMessages());
 
         $this->producer->sendMessageToTopic($dataJson);
     }
 
-    public function consumeInitialResponse() {
+    public function consumeInitialResponse()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -58,7 +61,8 @@ class Requester
         }
     }
 
-    public function consumeFinalMessage() {
+    public function consumeFinalMessage()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -88,14 +92,16 @@ class Requester
         }
     }
 
-    public function getMessages() {
+    public function getMessages()
+    {
         return [
             "id" => uniqid(),
             "message" => "Hi, "
         ];
     }
 
-    public function getFields() {
+    public function getFields()
+    {
         return [
             [
                 "type" => "string",

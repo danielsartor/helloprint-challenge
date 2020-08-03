@@ -10,9 +10,10 @@ class Consumer
     private $topic;
     private $topicName;
 
-    public function __construct($config, $topicName) {
+    public function __construct($config, $topicName)
+    {
         $this->configKafka = $config->getConfig();
-        $this->brokerKafka = $config->getBrokerAddress();
+        $this->brokerKafka = $config::BROKER_ADDRESS;
         $this->topicName = $topicName;
 
         //Consumer
@@ -22,7 +23,8 @@ class Consumer
         $this->consumer->addBrokers($this->brokerKafka);
     }
 
-    public function topicConsumeStart($offset = RD_KAFKA_OFFSET_BEGINNING, $partition = 0) {
+    public function topicConsumeStart($offset = RD_KAFKA_OFFSET_BEGINNING, $partition = 0)
+    {
         $this->topic = $this->consumer->newTopic($this->topicName);
 
         $this->topic->consumeStart($partition, $offset);
@@ -30,7 +32,8 @@ class Consumer
         echo "Consuming for Topic $this->topicName has started\n";
     }
 
-    public function topicConsumeMessage($timeout = 1000, $partition = 0) {
+    public function topicConsumeMessage($timeout = 1000, $partition = 0)
+    {
         return $this->topic->consume($partition, $timeout);
     }
 

@@ -11,7 +11,8 @@ class ServiceB
 {
     private $bye = "Bye.";
 
-    public function __construct() {
+    public function __construct()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -25,7 +26,8 @@ class ServiceB
         $this->consume();
     }
 
-    public function consume() {
+    public function consume()
+    {
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 
@@ -39,7 +41,8 @@ class ServiceB
         }
     }
 
-    public function produceMessageToConnector() {
+    public function produceMessageToConnector()
+    {
         //Build Json with formatted message
         $dataJson = Utils::buildJsonMessage($this->getFields(), $this->getMessages());
 
@@ -47,14 +50,16 @@ class ServiceB
         $this->producer->sendMessageToTopic($dataJson);
     }
 
-    public function getMessages() {
+    public function getMessages()
+    {
         return [
             "id" => $this->data->id,
             "message" => $this->data->message . $this->bye
         ];
     }
 
-    public function getFields() {
+    public function getFields()
+    {
         return [
             [
                 "type" => "string",

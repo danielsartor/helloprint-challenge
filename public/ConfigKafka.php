@@ -4,25 +4,29 @@ namespace Helloprint;
 
 class ConfigKafka
 {
+    const BROKER_ADDRESS = "kafka:9094";
+    const BOOTSTRAP_SERVERS = "bootstrap.servers";
     private $config;
-    private $brokerAddress = "kafka:9094";
-    private $bootstrapServersConfig = "bootstrap.servers";
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->config = new \RdKafka\Conf();
-        $this->setConfig($this->bootstrapServersConfig, $this->brokerAddress);
+        $this->setConfig(self::BOOTSTRAP_SERVERS, self::BROKER_ADDRESS);
     }
 
-    public function getConfig() {
+    public function getConfig()
+    {
         return $this->config;
     }
 
-    public function setConfig($param, $value) {
+    public function setConfig($param, $value)
+    {
         $this->config->set($param, $value);
     }
 
-    public function getBrokerAddress() {
-        return $this->brokerAddress;
+    public function getBrokerAddress()
+    {
+        return self::BROKER_ADDRESS;
     }
 
 }

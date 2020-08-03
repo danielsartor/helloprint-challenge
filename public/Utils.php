@@ -4,7 +4,8 @@ namespace Helloprint;
 
 class Utils
 {
-    static function buildJsonMessage($fields, $messages) {
+    static function buildJsonMessage($fields, $messages)
+    {
         return json_encode([
             "schema" => [
                 "type" => "struct",

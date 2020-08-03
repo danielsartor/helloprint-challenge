@@ -11,7 +11,8 @@ class ServiceA
     private $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
     private $data = NULL;
 
-    public function __construct() {
+    public function __construct()
+    {
         //Configuration
         $this->config = new ConfigKafka();
 
@@ -25,7 +26,8 @@ class ServiceA
         $this->consume();
     }
 
-    public function consume() {
+    public function consume()
+    {
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 
@@ -39,12 +41,12 @@ class ServiceA
         }
     }
 
-    public function produceMessageToTopicB() {
+    public function produceMessageToTopicB()
+    {
         
         //Format Message
         $formatted_message = $this->data->message . $this->names[array_rand($this->names)].". ";
 
-        var_dump($this->data, $formatted_message);
         //Update message
         $this->data->message = $formatted_message;
 
