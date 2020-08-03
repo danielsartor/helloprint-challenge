@@ -38,6 +38,4 @@ class Producer
 
         echo "Produced message $message for Topic $this->topicName\n";
     }
-
-    
 }

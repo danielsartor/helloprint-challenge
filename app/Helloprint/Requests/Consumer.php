@@ -36,5 +36,4 @@ class Consumer
     {
         return $this->topic->consume($partition, $timeout);
     }
-
 }

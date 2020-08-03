@@ -28,5 +28,4 @@ class ConfigKafka
     {
         return self::BROKER_ADDRESS;
     }
-
 }
