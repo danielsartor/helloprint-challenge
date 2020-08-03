@@ -5,13 +5,12 @@ namespace Helloprint;
 class ConfigKafka
 {
     private $config;
-    private $brokerAddress;
+    private $brokerAddress = "kafka:9094";
+    private $bootstrapServersConfig = "bootstrap.servers";
 
     public function __construct() {
-        $this->brokerAddress = "kafka:9094";
-
         $this->config = new \RdKafka\Conf();
-        $this->setConfig("bootstrap.servers", $this->brokerAddress);
+        $this->setConfig($this->bootstrapServersConfig, $this->brokerAddress);
     }
 
     public function getConfig() {
