@@ -1,10 +1,10 @@
 <?php
 
-namespace Helloprint;
+namespace Helloprint\Services;
 
-require 'ConfigKafka.php';
-require 'Consumer.php';
-require 'Producer.php';
+use Helloprint\Utils\ConfigKafka as ConfigKafka;
+use Helloprint\Requests\Producer as Producer;
+use Helloprint\Requests\Consumer as Consumer;
 
 class ServiceA
 {
@@ -57,5 +57,3 @@ class ServiceA
         $this->producer->sendMessageToTopic($dataJson);
     }
 }
-
-new ServiceA();

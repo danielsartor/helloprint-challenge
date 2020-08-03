@@ -1,10 +1,10 @@
 <?php
 
-namespace Helloprint;
+namespace Helloprint\Utils;
 
 class Utils
 {
-    static function buildJsonMessage($fields, $messages)
+    public static function buildJsonMessage($fields, $messages)
     {
         return json_encode([
             "schema" => [

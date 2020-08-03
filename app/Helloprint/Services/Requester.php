@@ -1,11 +1,11 @@
 <?php
 
-namespace Helloprint;
+namespace Helloprint\Services;
 
-require 'Utils.php';
-require 'ConfigKafka.php';
-require 'Consumer.php';
-require 'Producer.php';
+use Helloprint\Utils\Utils as Utils;
+use Helloprint\Utils\ConfigKafka as ConfigKafka;
+use Helloprint\Requests\Producer as Producer;
+use Helloprint\Requests\Consumer as Consumer;
 
 class Requester
 {
@@ -115,5 +115,3 @@ class Requester
         ];
     }
 }
-
-new Requester();

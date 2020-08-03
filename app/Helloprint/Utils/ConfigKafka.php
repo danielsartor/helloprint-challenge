@@ -1,6 +1,6 @@
 <?php
 
-namespace Helloprint;
+namespace Helloprint\Utils;
 
 class ConfigKafka
 {

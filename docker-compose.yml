@@ -7,6 +7,12 @@ services:
         - ./:/usr/helloprint/
     working_dir: /usr/helloprint/
 
+  composer:
+    image: composer
+    command: ["composer", "dump-autoload", "-o"]
+    volumes:
+      - ./:/app
+
   postgres:
     build: ./docker/postgres
     restart: always
