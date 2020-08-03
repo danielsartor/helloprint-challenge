@@ -36,6 +36,6 @@ class Producer
         
         $this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message);
 
-        echo "Produced message $message for Topic $this->topicName\n";
+        echo "Produced message $message for Topic $this->topicName \n\n";
     }
 }

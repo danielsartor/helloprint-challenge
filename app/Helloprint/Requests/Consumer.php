@@ -29,7 +29,7 @@ class Consumer
 
         $this->topic->consumeStart($partition, $offset);
 
-        echo "Consuming for Topic $this->topicName has started\n";
+        echo "Consuming for Topic $this->topicName has started\n\n";
     }
 
     public function topicConsumeMessage($timeout = 1000, $partition = 0)

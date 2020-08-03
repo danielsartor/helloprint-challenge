@@ -34,7 +34,7 @@ class ServiceB
             if ($msg->payload) {
                 $this->data = json_decode($msg->payload);
 
-                echo "Message Received: ".$this->data->message."\n";
+                echo "Message Received: ".$this->data->message."\n\n";
                 
                 $this->produceMessageToConnector();
             }

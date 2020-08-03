@@ -38,7 +38,7 @@ class Connector
             $msg = $this->consumer->topicConsumeMessage();
 
             if ($msg->payload) {
-                echo "Message Received from Connector Source.\n";
+                echo "Message Received from Connector Source. \n\n";
                 $data = json_decode($msg->payload);
 
                 if (!$this->$dataJson) {

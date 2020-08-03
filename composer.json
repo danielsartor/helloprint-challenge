@@ -3,8 +3,5 @@
         "psr-4": {
             "Helloprint\\": "app/Helloprint"
         }
-    },
-    "require": {
-        "friendsofphp/php-cs-fixer": "^2.16"
     }
 }

@@ -45,8 +45,6 @@ class Requester
         $this->consumer = new Consumer($this->config, "Requester");
         $this->consumer->topicConsumeStart();
 
-        echo "Consuming Initial Response\n";
-
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
             $this->message = json_decode($msg->payload) ?? $this->message;
@@ -56,6 +54,7 @@ class Requester
         }
 
         if ($this->message->id) {
+            echo "Received ID from Connector \n\n";
             $this->consumeFinalMessage();
         } else {
             echo 'ERROR: Failed to retrieve ID.';
@@ -71,8 +70,6 @@ class Requester
         //Consumer
         $this->consumer = new Consumer($this->config, "Broker");
         $this->consumer->topicConsumeStart();
-
-        echo "Consuming Final Response\n";
 
         $start_time = round(microtime(true) * 1000);
 
