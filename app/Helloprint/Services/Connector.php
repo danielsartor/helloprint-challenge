@@ -8,12 +8,12 @@ use Helloprint\Requests\Consumer as Consumer;
 
 class Connector
 {
-    private $dataJson = NULL;
-    private $config = NULL;
-    private $consumer = NULL;
-    private $producerRequester = NULL;
-    private $producerTopicA = NULL;
-    private $producerBroker = NULL;
+    private $dataJson = null;
+    private $config = null;
+    private $consumer = null;
+    private $producerRequester = null;
+    private $producerTopicA = null;
+    private $producerBroker = null;
 
     public function __construct()
     {
@@ -50,9 +50,8 @@ class Connector
                     
                     $this->produceFinalMessage();
                     
-                    $this->$dataJson = NULL;
+                    $this->$dataJson = null;
                 }
-                
             }
         }
     }

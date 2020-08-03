@@ -9,7 +9,7 @@ use Helloprint\Requests\Consumer as Consumer;
 class ServiceA
 {
     private $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
-    private $data = NULL;
+    private $data = null;
 
     public function __construct()
     {

@@ -9,10 +9,10 @@ use Helloprint\Requests\Consumer as Consumer;
 
 class Requester
 {
-    private $config = NULL;
-    private $producer = NULL;
-    private $consumer = NULL;
-    private $message = NULL;
+    private $config = null;
+    private $producer = null;
+    private $consumer = null;
+    private $message = null;
 
     public function __construct()
     {
@@ -47,10 +47,12 @@ class Requester
 
         echo "Consuming Initial Response\n";
 
-        while(true) {
+        while (true) {
             $msg = $this->consumer->topicConsumeMessage();
             $this->message = json_decode($msg->payload) ?? $this->message;
-            if (!$msg) break;
+            if (!$msg) {
+                break;
+            }
         }
 
         if ($this->message->id) {
@@ -74,7 +76,7 @@ class Requester
 
         $start_time = round(microtime(true) * 1000);
 
-        while(true) {
+        while (true) {
             $msg = $this->consumer->topicConsumeMessage(50);
 
             $time = round(microtime(true) * 1000);
@@ -82,7 +84,7 @@ class Requester
             if (($time - $start_time) > 1000) {
                 echo "TIMEOUT: No reponse for ID: ".$message->id."\n";
                 exit;
-            } else if ($msg){
+            } elseif ($msg) {
                 $data = json_decode($msg->payload);
                 if ($this->message->id == $data->id) {
                     echo $data->message;
