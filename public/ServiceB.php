@@ -1,61 +1,71 @@
 <?php
-    require_once('helpers/helpers.php');
 
-    $bye = "Bye.";
+namespace Helloprint;
 
-    //Producer
-    $producer = new \RdKafka\Producer($conf);
+require 'ConfigKafka.php';
+require 'Consumer.php';
+require 'Producer.php';
 
-    //Consumer
-    $consumer = new \RdKafka\Consumer($conf);
+class ServiceB
+{
+    private $bye = "Bye.";
 
-    //Broker
-    $consumer->addBrokers("kafka:9094");
+    public function __construct() {
+        //Configuration
+        $this->config = new ConfigKafka();
 
-    //TopicB Topic
-    $topic = $consumer->newTopic("TopicB");
-    
-    //Start Consuming
-    $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+        //Consumer
+        $this->consumer = new Consumer($this->config, "TopicB");
 
-    echo "Consuming from TopicB\n";
-    while (true) {
-        $msg = $topic->consume(0, 1000);
+        //Producer
+        $this->producer = new Producer($this->config, "helloprint.requests");
 
-        if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-            continue;
-        } elseif ($msg->err) {
-            echo $msg->errstr(), "\n";
-            break;
-        } else {
-            $data = json_decode($msg->payload);
-            echo "Message Received: ".$data->message."\n";
+        $this->consumer->topicConsumeStart();
+        $this->consume();
+    }
 
-            //Data
-            $formatted_message = $data->message . $bye;
+    public function consume() {
+        while (true) {
+            $msg = $this->consumer->topicConsumeMessage();
 
-            $messages = [
-                "id" => $data->id,
-                "message" => $formatted_message
-            ];
+            if ($msg->payload) {
+                $this->data = json_decode($msg->payload);
 
-            $fields = [
-                [
-                    "type" => "string",
-                    "optional" => false,
-                    "field" => "id"
-                ],
-                [
-                    "type" => "string",
-                    "optional" => false,
-                    "field" => "message"
-                ]
-            ];
-
-            $dataJson = buildJsonMessage($fields, $messages);
-
-            sendMessage($producer, "helloprint.requests", $dataJson);
-
-            echo "Message Sent to Connector Sink: ".$formatted_message."\n\n";
+                echo "Message Received: ".$this->data->message."\n";
+                
+                $this->produceMessageToConnector();
+            }
         }
     }
+
+    public function produceMessageToConnector() {
+        //Build Json with formatted message
+        $dataJson = $this->producer->buildJsonMessage($this->getFields(), $this->getMessages());
+
+        //Produce
+        $this->producer->sendMessageToTopic($dataJson);
+    }
+
+    public function getMessages() {
+        return [
+            "id" => $this->data->id,
+            "message" => $this->data->message . $this->bye
+        ];
+    }
+
+    public function getFields() {
+        return [
+            [
+                "type" => "string",
+                "optional" => false,
+                "field" => "id"
+            ],[
+                "type" => "string",
+                "optional" => false,
+                "field" => "message"
+            ]
+        ];
+    }
+}
+
+new ServiceB();

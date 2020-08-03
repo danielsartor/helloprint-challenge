@@ -1,45 +1,59 @@
 <?php
-    require_once('helpers/helpers.php');
 
-    $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
+namespace Helloprint;
 
-    //Producer
-    $producer = new \RdKafka\Producer($conf);
+require 'ConfigKafka.php';
+require 'Consumer.php';
+require 'Producer.php';
 
-    //Consumer
-    $consumer = new \RdKafka\Consumer($conf);
+class ServiceA
+{
+    private $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
+    private $data = NULL;
 
-    //Broker
-    $consumer->addBrokers("kafka:9094");
+    public function __construct() {
+        //Configuration
+        $this->config = new ConfigKafka();
 
-    //TopicA Topic
-    $topic = $consumer->newTopic("TopicA");
+        //Consumer
+        $this->consumer = new Consumer($this->config, "TopicA");
 
-    //Start Consuming
-    $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+        //Producer
+        $this->producer = new Producer($this->config, "TopicB");
 
-    echo "Consuming from TopicA\n";
-    while (true) {
-        $msg = $topic->consume(0, 1000);
+        $this->consumer->topicConsumeStart();
+        $this->consume();
+    }
 
-        if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-            continue;
-        } elseif ($msg->err) {
-            echo $msg->errstr(), "\n";
-            break;
-        } else {
-            $data = json_decode($msg->payload);
-            echo "Message Received: ".$data->message."\n";
+    public function consume() {
+        while (true) {
+            $msg = $this->consumer->topicConsumeMessage();
 
-            //Format Message
-            $formatted_message = $data->message . $names[array_rand($names)].". ";
+            if ($msg->payload) {
+                $this->data = json_decode($msg->payload);
+                
+                echo "Message Received: ".$this->data->message."\n";
 
-            $data->message = $formatted_message;
-
-            $dataJson = json_encode($data);
-
-            sendMessage($producer, "TopicB", $dataJson);
-
-            echo "Message Sent to TopicB: ".$formatted_message."\n\n";
+                $this->produceMessageToTopicB();
+            }
         }
     }
+
+    public function produceMessageToTopicB() {
+        
+        //Format Message
+        $formatted_message = $this->data->message . $this->names[array_rand($this->names)].". ";
+
+        var_dump($this->data, $formatted_message);
+        //Update message
+        $this->data->message = $formatted_message;
+
+        //Encode to Json
+        $dataJson = json_encode($this->data);
+
+        //Produce
+        $this->producer->sendMessageToTopic($dataJson);
+    }
+}
+
+new ServiceA();

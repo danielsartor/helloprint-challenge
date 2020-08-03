@@ -1,52 +1,72 @@
 <?php
-    require_once('helpers/helpers.php');
 
-    //Producer
-    $producer = new \RdKafka\Producer($conf);
+namespace Helloprint;
 
-    //Consumer
-    $consumer = new \RdKafka\Consumer($conf);
+require 'ConfigKafka.php';
+require 'Consumer.php';
+require 'Producer.php';
 
-    //Broker
-    $consumer->addBrokers("kafka:9094");
+class Connector
+{
+    private $dataJson = NULL;
+    private $config = NULL;
+    private $consumer = NULL;
+    private $producerRequester = NULL;
+    private $producerTopicA = NULL;
+    private $producerBroker = NULL;
 
-    //Postgres Consumer Topic
-    $topic = $consumer->newTopic("dbserver1.helloprint.requests");
+    public function __construct() {
+        //Configuration
+        $this->config = new ConfigKafka();
 
-    //Start Consuming
-    $topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);
+        //Consumer
+        $this->consumer = new Consumer($this->config, "dbserver1.helloprint.requests");
 
-    //Save last request to avoid loops. For some reason connector doesnt return the "before".
-    $dataJson = NULL;
+        //Producers
+        $this->producerRequester = new Producer($this->config, "Requester");
+        $this->producerTopicA = new Producer($this->config, "TopicA");
+        $this->producerBroker = new Producer($this->config, "Broker");
 
-    echo "Consuming from Postgres\n";
-    while (true) {
-        $msg = $topic->consume(0, 1000);
-        if (!$msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
-            continue;
-        } elseif ($msg->err) {
-            echo $msg->errstr(), "\n";
-            break;
-        } else {
+        $this->consumer->topicConsumeStart();
+        $this->consume();
+    }
+
+    public function consume() {
+        while (true) {
+            $msg = $this->consumer->topicConsumeMessage();
+
             if ($msg->payload) {
                 echo "Message Received from Connector Source.\n";
                 $data = json_decode($msg->payload);
-                if (!$dataJson) {
-                    $dataJson = json_encode($data->payload->after);
 
-                    sendMessage($producer, "TopicA", $dataJson);
-                    sendMessage($producer, "Requester", $dataJson);
+                if (!$this->$dataJson) {
+                    $this->$dataJson = json_encode($data->payload->after);
 
-                    echo "Sent message to TopicA and Requester\n".$dataJson."\n\n";
+                    $this->produceInitialMessages();
                 } else {
-                    $dataJson = json_encode($data->payload->after);
-
-                    sendMessage($producer, "Broker", $dataJson);
+                    $this->$dataJson = json_encode($data->payload->after);
                     
-                    echo "Sent Message to Broker: \n".$dataJson."\n\n";
-                    $dataJson = NULL;
+                    $this->produceFinalMessage();
+                    
+                    $this->$dataJson = NULL;
                 }
                 
             }
         }
     }
+
+    public function produceInitialMessages() {
+        //Produce
+        $this->producerRequester->sendMessageToTopic($this->$dataJson);
+
+        //Produce
+        $this->producerTopicA->sendMessageToTopic($this->$dataJson);
+    }
+
+    public function produceFinalMessage() {
+        //Produce
+        $this->producerBroker->sendMessageToTopic($this->$dataJson);
+    }
+}
+
+new Connector();
