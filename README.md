@@ -5,7 +5,8 @@
 - Docker Compose
 
 ## SETUP ENVIROMENT  
-Open your terminal and run `docker-compose up -d`  
+Open your terminal and run the following command  
+`docker-compose up -d`  
 
 When the installation is done run the following commands from the CONFIG folder to create the connect configuration.
 
