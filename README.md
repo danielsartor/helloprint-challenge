@@ -21,7 +21,7 @@ Run the following command to check if both connectors were created.
 
 ## HOW TO EXECUTE
 Open 4 Terminals and execute each command in a terminal.  
-Terminal 1: `exec php php /usr/helloprint/start/connector.php`.  
-Terminal 2: `exec php php /usr/helloprint/start/servicea.php`.  
-Terminal 3: `exec php php /usr/helloprint/start/serviceb.php`.  
-Terminal 4: `exec php php /usr/helloprint/start/requester.php`.  
+Terminal 1: `docker-compose exec php php /usr/helloprint/start/connector.php`.  
+Terminal 2: `docker-compose exec php php /usr/helloprint/start/servicea.php`.  
+Terminal 3: `docker-compose exec php php /usr/helloprint/start/serviceb.php`.  
+Terminal 4: `docker-compose exec php php /usr/helloprint/start/requester.php`.  
