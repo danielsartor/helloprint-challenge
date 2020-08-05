@@ -23,9 +23,4 @@ class ConfigKafka
     {
         $this->config->set($param, $value);
     }
-
-    public function getBrokerAddress()
-    {
-        return self::BROKER_ADDRESS;
-    }
 }

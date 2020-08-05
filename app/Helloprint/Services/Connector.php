@@ -2,38 +2,30 @@
 
 namespace Helloprint\Services;
 
-use Helloprint\Utils\ConfigKafka as ConfigKafka;
-use Helloprint\Requests\Producer as Producer;
-use Helloprint\Requests\Consumer as Consumer;
-
 class Connector
 {
     private $dataJson = null;
-    private $config = null;
     private $consumer = null;
     private $producerRequester = null;
     private $producerTopicA = null;
     private $producerBroker = null;
 
-    public function __construct()
+    public function __construct($consumer, $producerRequester, $producerTopicA, $producerBroker)
     {
-        //Configuration
-        $this->config = new ConfigKafka();
-
         //Consumer
-        $this->consumer = new Consumer($this->config, "dbserver1.helloprint.requests");
+        $this->consumer = $consumer;
 
         //Producers
-        $this->producerRequester = new Producer($this->config, "Requester");
-        $this->producerTopicA = new Producer($this->config, "TopicA");
-        $this->producerBroker = new Producer($this->config, "Broker");
+        $this->producerRequester = $producerRequester;
+        $this->producerTopicA = $producerTopicA;
+        $this->producerBroker = $producerBroker;
 
-        $this->consumer->topicConsumeStart();
         $this->consume();
     }
-
+    
     public function consume()
     {
+        $this->consumer->topicConsumeStart();
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 

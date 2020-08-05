@@ -15,6 +15,7 @@ class Producer
         $this->configKafka = $config->getConfig();
         $this->brokerKafka = $config::BROKER_ADDRESS;
         $this->topicName = $topicName;
+        
         //Producer
         $this->producer = new \RdKafka\Producer($this->configKafka);
 

@@ -3,24 +3,25 @@
 namespace Helloprint\Services;
 
 use Helloprint\Utils\Utils as Utils;
-use Helloprint\Utils\ConfigKafka as ConfigKafka;
-use Helloprint\Requests\Producer as Producer;
-use Helloprint\Requests\Consumer as Consumer;
 
 class Requester
 {
     private $config = null;
     private $producer = null;
-    private $consumer = null;
+    private $consumerRequester = null;
+    private $consumerBroker = null;
     private $message = null;
 
-    public function __construct()
+    public function __construct($producer, $consumerRequester, $consumerBroker)
     {
-        //Configuration
-        $this->config = new ConfigKafka();
+         //Producer
+        $this->producer = $producer;
 
-        //Producer
-        $this->producer = new Producer($this->config, "helloprint.requests");
+        //Consumer
+        $this->consumerRequester = $consumerRequester;
+
+        //Consumer
+        $this->consumerBroker = $consumerBroker;
 
         //Produce Message
         $this->produceMessageToTopic();
@@ -31,22 +32,17 @@ class Requester
 
     public function produceMessageToTopic()
     {
-        $dataJson = Utils::buildJsonMessage($this->getFields(), $this->getMessages());
+        $dataJson = Utils::buildJsonMessage("requests", $this->getFields(), $this->getMessages());
 
         $this->producer->sendMessageToTopic($dataJson);
     }
 
     public function consumeInitialResponse()
     {
-        //Configuration
-        $this->config = new ConfigKafka();
-
-        //Consumer
-        $this->consumer = new Consumer($this->config, "Requester");
-        $this->consumer->topicConsumeStart();
+        $this->consumerRequester->topicConsumeStart();
 
         while (true) {
-            $msg = $this->consumer->topicConsumeMessage();
+            $msg = $this->consumerRequester->topicConsumeMessage();
             $this->message = json_decode($msg->payload) ?? $this->message;
             if (!$msg) {
                 break;
@@ -64,17 +60,12 @@ class Requester
 
     public function consumeFinalMessage()
     {
-        //Configuration
-        $this->config = new ConfigKafka();
-
-        //Consumer
-        $this->consumer = new Consumer($this->config, "Broker");
-        $this->consumer->topicConsumeStart();
+        $this->consumerBroker->topicConsumeStart();
 
         $start_time = round(microtime(true) * 1000);
 
         while (true) {
-            $msg = $this->consumer->topicConsumeMessage(50);
+            $msg = $this->consumerBroker->topicConsumeMessage(50);
 
             $time = round(microtime(true) * 1000);
 

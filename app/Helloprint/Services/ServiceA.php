@@ -2,32 +2,28 @@
 
 namespace Helloprint\Services;
 
-use Helloprint\Utils\ConfigKafka as ConfigKafka;
-use Helloprint\Requests\Producer as Producer;
-use Helloprint\Requests\Consumer as Consumer;
-
 class ServiceA
 {
-    private $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
+    private $consumer = null;
+    private $producer = null;
     private $data = null;
+    private $names = ["Joao", "Bram", "Gabriel", "Fehim", "Eni", "Patrick", "Micha", "Mirzet", "Liliana", "Sebastien"];
 
-    public function __construct()
+    public function __construct($consumer, $producer)
     {
-        //Configuration
-        $this->config = new ConfigKafka();
-
         //Consumer
-        $this->consumer = new Consumer($this->config, "TopicA");
+        $this->consumer = $consumer;
 
         //Producer
-        $this->producer = new Producer($this->config, "TopicB");
+        $this->producer = $producer;
 
-        $this->consumer->topicConsumeStart();
         $this->consume();
     }
-
+    
     public function consume()
     {
+        $this->consumer->topicConsumeStart();
+
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 
@@ -41,19 +37,20 @@ class ServiceA
         }
     }
 
-    public function produceMessageToTopicB()
+    public function produceMessageToTopic()
     {
-        
+        //Produce
+        $this->producer->sendMessageToTopic($this->getFormattedMessage());
+    }
+
+    public function getFormattedMessage()
+    {
         //Format Message
         $formatted_message = $this->data->message . $this->names[array_rand($this->names)].". ";
 
         //Update message
         $this->data->message = $formatted_message;
 
-        //Encode to Json
-        $dataJson = json_encode($this->data);
-
-        //Produce
-        $this->producer->sendMessageToTopic($dataJson);
+        return json_encode($this->data);
     }
 }

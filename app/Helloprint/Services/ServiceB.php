@@ -2,32 +2,27 @@
 
 namespace Helloprint\Services;
 
-use Helloprint\Utils\Utils as Utils;
-use Helloprint\Utils\ConfigKafka as ConfigKafka;
-use Helloprint\Requests\Producer as Producer;
-use Helloprint\Requests\CoNsumer as Consumer;
-
 class ServiceB
 {
+    private $consumer = null;
+    private $producer = null;
     private $bye = "Bye.";
 
-    public function __construct()
+    public function __construct($consumer, $producer)
     {
-        //Configuration
-        $this->config = new ConfigKafka();
-
         //Consumer
-        $this->consumer = new Consumer($this->config, "TopicB");
+        $this->consumer = $consumer;
 
         //Producer
-        $this->producer = new Producer($this->config, "helloprint.requests");
+        $this->producer = $producer;
 
-        $this->consumer->topicConsumeStart();
         $this->consume();
     }
-
+    
     public function consume()
     {
+        $this->consumer->topicConsumeStart();
+
         while (true) {
             $msg = $this->consumer->topicConsumeMessage();
 
@@ -44,7 +39,7 @@ class ServiceB
     public function produceMessageToConnector()
     {
         //Build Json with formatted message
-        $dataJson = Utils::buildJsonMessage($this->getFields(), $this->getMessages());
+        $dataJson = Utils::buildJsonMessage("requests", $this->getFields(), $this->getMessages());
 
         //Produce
         $this->producer->sendMessageToTopic($dataJson);
