@@ -6,7 +6,6 @@ use Helloprint\Utils\Utils as Utils;
 
 class Requester
 {
-    private $config = null;
     private $producer = null;
     private $consumerRequester = null;
     private $consumerBroker = null;
@@ -14,13 +13,11 @@ class Requester
 
     public function __construct($producer, $consumerRequester, $consumerBroker)
     {
-         //Producer
+        //Producer
         $this->producer = $producer;
 
-        //Consumer
+        //Consumers
         $this->consumerRequester = $consumerRequester;
-
-        //Consumer
         $this->consumerBroker = $consumerBroker;
 
         //Produce Message
