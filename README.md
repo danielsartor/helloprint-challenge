@@ -1,4 +1,4 @@
-# helloprint-challenge (UNDER DEVELOPMENT)
+# helloprint-challenge
 
 ## REQUIREMENTS
 - Docker
