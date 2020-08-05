@@ -32,7 +32,7 @@ class ServiceA
                 
                 echo "Message Received: ".$this->data->message."\n\n";
 
-                $this->produceMessageToTopicB();
+                $this->produceMessageToTopic();
             }
         }
     }

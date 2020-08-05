@@ -18,4 +18,4 @@ $consumerBroker = new Consumer($config, Topics::BROKER);
 //Producer
 $producer = new Producer($config, Topics::HELLOPRINT_REQUESTS);
 
-new Requester($config, $producer, $consumerRequester, $consumerBroker);
+new Requester($producer, $consumerRequester, $consumerBroker);

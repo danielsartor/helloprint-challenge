@@ -2,6 +2,8 @@
 
 namespace Helloprint\Services;
 
+use Helloprint\Utils\Utils as Utils;
+
 class ServiceB
 {
     private $consumer = null;
